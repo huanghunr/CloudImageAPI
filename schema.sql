@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS images (
-    id SERIAL PRIMARY KEY,
-    url TEXT NOT NULL,
-    type VARCHAR(20) NOT NULL, -- desktop / mobile
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
