@@ -12,7 +12,7 @@
 * **/delete** → 删除图片（POST）
 * **/list** → 获取所有图片信息（POST）
 * **/random-image** → 获取随机图片链接并跳转（GET）
-* 通过 operate_images_batch.py 和公网ip可以实现远程批量操作。
+* 通过 images_batch.py 和公网ip可以实现远程批量操作。
 ---
 
 ## 📦部署方式
@@ -165,6 +165,8 @@ curl -X POST http://127.0.0.1:5000/delete \
   | 参数名   | 必填 | 说明       |
   | ----- | -- | -------- |
   | token | ✅  | API 安全密钥 |
+  | page | ❌ | 当前的页面数(默认1) |
+  | per_page| ❌ | 页面最大显示数量(默认20)|
 
 * **示例**：
 
