@@ -27,7 +27,7 @@ cd CloudImageAPI
 默认为
 ```
 DB_PASS=img_user@SQL123  #数据库密钥
-ADD_IMAGE_TOKEN=default_token@add_images123 #验证token
+API_TOKEN=default_token@add_images123 #验证token
 ```
 dockerfile
 ```
@@ -63,6 +63,12 @@ RUN chmod +x /init.sh
 CMD ["/init.sh"]
 
 ```
+请在 app.py 文件中，添加受信任的图片链接。
+```
+# 受信任的图片链接
+ALLOWED_DOMAINS = ["static.example.com"]
+```
+
 ### 3.运行容器
 ```bash
 docker build --pull --rm -f 'dockerfile' -t 'cloudimageapi:latest' '.' 
@@ -164,7 +170,9 @@ curl -X POST http://127.0.0.1:5000/delete \
 
 ```bash
 curl -X POST http://127.0.0.1:5000/list \
-     -F "token=你的安全密钥"
+     -F "token=你的安全密钥" \
+     -F "page = 当前页" \
+     -F "per_page = 页面最大显示数量"
 ```
 
 * **返回**：

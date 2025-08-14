@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify, redirect
 import psycopg2
 import random
 import os
+import hmac
 from functools import wraps
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 
@@ -16,6 +18,9 @@ DB_PASS = os.getenv("DB_PASS")
 # 用于认证的密钥
 API_TOKEN = os.getenv("API_TOKEN")
 
+# 受信任的图片链接
+ALLOWED_DOMAINS = ["static.example.com"]
+
 # 数据库连接
 def get_conn():
     return psycopg2.connect(
@@ -28,7 +33,7 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.form.get("token")
-        if token != API_TOKEN:
+        if not token or not hmac.compare_digest(token, API_TOKEN):
             return jsonify({"error": "无效的 token"}), 403
         return f(*args, **kwargs)
     return decorated
@@ -42,6 +47,15 @@ def add_image():
 
     if not url:
         return jsonify({"error": "缺少 url 参数"}), 400
+    
+    # 验证添加的url是否可信
+    try:
+        parsed_url = urlparse(url)
+        if not parsed_url.scheme in ["http", "https"] or parsed_url.hostname not in ALLOWED_DOMAINS:
+            return jsonify({"error": "URL 域名不被允许"}), 400
+    except Exception:
+        return jsonify({"error": "无效的 URL 格式"}), 400
+    
     if img_type not in ["mobile", "desktop"]:
         return jsonify({"error": "type 只能是 mobile 或 desktop"}), 400
 
@@ -90,19 +104,36 @@ def delete_image():
 @app.route("/list", methods=["POST"])
 @token_required
 def list_images():
+    # 从请求中获取分页参数，提供默认值
+    page = request.form.get("page", 1, type=int)
+    per_page = request.form.get("per_page", 20, type=int)
+    offset = (page - 1) * per_page
+
     conn = get_conn()
     cur = conn.cursor()
 
     try:
-        cur.execute("SELECT id, url, type FROM images ORDER BY id ASC")
+        # 使用 LIMIT 和 OFFSET 来分页查询
+        cur.execute(
+            "SELECT id, url, type FROM images ORDER BY id ASC LIMIT %s OFFSET %s",
+            (per_page, offset)
+        )
         rows = cur.fetchall()
+
+        # 获取总条目数，用于返回给前端
+        cur.execute("SELECT COUNT(*) FROM images")
+        total_count = cur.fetchone()[0]
 
         images = [
             {"id": r[0], "url": r[1], "type": r[2]}
             for r in rows
         ]
 
-        return jsonify({"count": len(images), "images": images})
+        return jsonify({
+            "total_count": total_count,
+            "page": page,
+            "images": images
+        })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
