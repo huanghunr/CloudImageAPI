@@ -12,7 +12,7 @@
 * **/delete** → 删除图片（POST）
 * **/list** → 获取所有图片信息（POST）
 * **/random-image** → 获取随机图片链接并跳转（GET）
-
+* 通过 operate_images_batch.py 和公网ip可以实现远程批量操作。
 ---
 
 ## 📦部署方式
@@ -205,3 +205,20 @@ curl "http://127.0.0.1:5000/random-image?type=desktop"
   * 直接 **302 重定向** 到随机图片 URL
 
 ---
+
+## 💡远程批量操作
+通过在本地运行python脚本合公网ip对远程服务器的图片链接进行批量操作。
+
+以下操作在本地执行。
+1.安装依赖
+```
+pip install requests
+```
+2.把 images_batch.py 文件下载或复制到本地。
+
+3.按照需要修改images_batch.py脚本内容。
+
+4.运行
+```
+python images_batch.py
+```
