@@ -21,7 +21,7 @@ ENV DB_USER=img_user
 # 你的数据库密码，尽量使用更复杂的密码
 ENV DB_PASS=img_user@SQL123
 # 你的安全密钥，用于添加图片/删除图片/列出图片的验证
-ENV ADD_IMAGE_TOKEN=default_token@add_images123
+ENV API_TOKEN=default_token@add_images123
 
 EXPOSE 5000
 

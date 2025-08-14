@@ -19,7 +19,7 @@
 
 ### 1.克隆项目
 ```bash
-git clone https://github.com/yourname/CloudImageAPI.git
+git clone https://github.com/huanghunr/CloudImageAPI.git
 cd CloudImageAPI
 ```
 ### 2.配置密钥
